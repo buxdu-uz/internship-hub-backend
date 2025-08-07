@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth:sanctum','cors']], function(){
     Route::group(['prefix' => 'admin','middleware' => ['role:admin']], function(){
         Route::get('users',[UserController::class,'getAllUsers']);
         Route::post('user_enterprises',[EnterpriseController::class,'userEnterprises']);
+        Route::post('users',[UserController::class,'store']);
     });
 
 
