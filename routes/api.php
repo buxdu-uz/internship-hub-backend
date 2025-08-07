@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth:sanctum','cors']], function(){
 //TEACHER
     Route::group(['prefix' => 'teachers','middleware' => ['role:teacher']], function(){
         Route::post('applications',[ApplicationController::class,'store']);
+            Route::post('upload/report',[ApplicationController::class,'uploadReportFile']);
     });
 
 

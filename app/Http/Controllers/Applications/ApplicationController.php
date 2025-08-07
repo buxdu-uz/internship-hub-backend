@@ -22,11 +22,12 @@ class ApplicationController extends Controller
                 $baseQuery = clone $application;
             } elseif (Auth::user()->hasRole('teacher')) {
                 $application->where('teacher_id', Auth::id());
-                $baseQuery = clone $application;
             } elseif (Auth::user()->hasRole('company-representative')) {
-                $enterpriseId = Auth::user()->userEnterprise->id;
-                $application->where('enterprise_id', $enterpriseId);
-                $baseQuery = clone $application;
+                if (!Auth::user()->userEnterprise) {
+                    return $this->errorResponse('Sizga hali korxona biriktirilmagan. Iltimos, administratorga murojaat qiling.'); // 400 - Bad Request
+                }
+
+                $application->where('enterprise_id', Auth::user()->userEnterprise->id);
             } else {
                 $baseQuery = clone $application;
             }
@@ -121,5 +122,53 @@ class ApplicationController extends Controller
         ]);
 
         return $this->successResponse('Application checked successfully');
+    }
+
+    public function uploadReportFile(Request $request)
+    {
+        $request->validate([
+            'application_id' => [
+                'required',
+                'exists:applications,id',
+                function ($attribute, $value, $fail) {
+                    $application = Application::find($value);
+
+                    if (!$application) {
+                        return $fail('Ushbu ariza topilmadi.');
+                    }
+
+                    if ($application->teacher_id != Auth::id()) {
+                        $fail('Siz ushbu ariza uchun hisobot faylini yuklashingiz mumkin emas.');
+                    }
+
+                    if ($application->status != 'approved') {
+                        $fail('Hisobot faylini faqat tasdiqlangan arizalar uchun yuklash mumkin.');
+                    }
+
+                    $alreadyUploaded = $application->files()
+                        ->where('fileable_id', $application->id)
+                        ->where('type', 'report')
+                        ->exists();
+
+                    if ($alreadyUploaded) {
+                        $fail('Hisobot fayli allaqachon yuklangan!');
+                    }
+                }
+            ],
+            'file' => 'required|file|max:1024|mimes:pdf',
+        ]);
+
+        $application = Application::find($request->application_id);
+
+        $filename = Str::random(6) . '_' . time() . '.' . $request->file('file')->getClientOriginalExtension();
+        $request->file('file')->storeAs('public/files/applications/', $filename);
+
+        $application->files()->create([
+            'filename' => $filename,
+            'type' => 'report',
+            'path' => url('storage/files/applications/' . $filename),
+        ]);
+
+        return $this->successResponse('Hisobot fayli muvaffaqiyatli yuklandi.');
     }
 }

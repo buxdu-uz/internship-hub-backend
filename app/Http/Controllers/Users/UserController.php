@@ -20,6 +20,7 @@ class UserController extends Controller
     public function getAllUsers()
     {
         $users = User::query()
+            ->orderByDesc('created_at')
             ->paginate(\request()->query('pagination',20));
         return UserResource::collection($users);
     }
