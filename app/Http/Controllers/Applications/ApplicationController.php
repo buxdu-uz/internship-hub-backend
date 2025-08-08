@@ -18,19 +18,24 @@ class ApplicationController extends Controller
 
         if (Auth::check()) {
             if (Auth::user()->hasRole('admin')) {
-                // Admin bo‘lsa hech qanday filter ishlatilmaydi
                 $baseQuery = clone $application;
             } elseif (Auth::user()->hasRole('teacher')) {
                 $application->where('teacher_id', Auth::id());
+                $baseQuery = clone $application;
             } elseif (Auth::user()->hasRole('company-representative')) {
                 if (!Auth::user()->userEnterprise) {
-                    return $this->errorResponse('Sizga hali korxona biriktirilmagan. Iltimos, administratorga murojaat qiling.'); // 400 - Bad Request
+                    return $this->errorResponse('Sizga hali korxona biriktirilmagan. Iltimos, administratorga murojaat qiling.');
                 }
 
                 $application->where('enterprise_id', Auth::user()->userEnterprise->id);
+                $baseQuery = clone $application;
             } else {
+                // Default fallback
                 $baseQuery = clone $application;
             }
+        } else {
+            // No Auth: optional, if guests are allowed
+            $baseQuery = clone $application;
         }
 
         $allCount      = (clone $baseQuery)->count();
