@@ -18,7 +18,8 @@ class UserResource extends JsonResource
             'login' => $this->login,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'profile' => new UserProfileResource($this->profile)
+            'profile' => new UserProfileResource($this->profile),
+            'enterprise' => new EnterPriseResource($this->userEnterprise->enterprise ?? null),
         ];
     }
 }
