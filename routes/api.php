@@ -18,7 +18,7 @@ Route::get('universities',[UniversityController::class, 'index']);
 Route::group(['middleware' => ['auth:sanctum','cors']], function(){
     Route::get('enterprise/all', [EnterpriseController::class,'getAll']);
     Route::get('roles', [UserController::class,'roles']);
-
+    Route::get('user/all',[UserController::class,'getAll']);
 
     //ADMIN
     Route::group(['prefix' => 'admin','middleware' => ['role:admin']], function(){

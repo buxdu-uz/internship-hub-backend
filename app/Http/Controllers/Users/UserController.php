@@ -25,6 +25,15 @@ class UserController extends Controller
         return UserResource::collection($users);
     }
 
+    public function getAll()
+    {
+        $users = User::query()
+            ->withoutrole('admin')
+            ->get()
+            ->sortBy('profile.firstname');
+        return UserResource::collection($users);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

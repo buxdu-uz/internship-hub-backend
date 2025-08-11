@@ -16,39 +16,45 @@ class ApplicationController extends Controller
     {
         $application = Application::query();
 
+        $currentMonthCount = (clone $application)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
+
+// Apply filters based on role
         if (Auth::check()) {
             if (Auth::user()->hasRole('admin')) {
-                $baseQuery = clone $application;
+                // Admin sees all
             } elseif (Auth::user()->hasRole('teacher')) {
                 $application->where('teacher_id', Auth::id());
-                $baseQuery = clone $application;
             } elseif (Auth::user()->hasRole('company-representative')) {
                 if (!Auth::user()->userEnterprise) {
-                    return $this->errorResponse('Sizga hali korxona biriktirilmagan. Iltimos, administratorga murojaat qiling.');
+                    return $this->errorResponse(
+                        'Sizga hali korxona biriktirilmagan. Iltimos, administratorga murojaat qiling.'
+                    );
                 }
-
-                $application->where('enterprise_id', Auth::user()->userEnterprise->id);
-                $baseQuery = clone $application;
-            } else {
-                // Default fallback
-                $baseQuery = clone $application;
+                $application->where('enterprise_id', Auth::user()->userEnterprise->enterprise_id);
             }
-        } else {
-            // No Auth: optional, if guests are allowed
-            $baseQuery = clone $application;
         }
 
+// Clone after filtering
+        $baseQuery = clone $application;
+
+// Status counts
         $allCount      = (clone $baseQuery)->count();
         $approvedCount = (clone $baseQuery)->where('status', 'approved')->count();
         $pendingCount  = (clone $baseQuery)->where('status', 'pending')->count();
 
-        $applications = $application->paginate(request()->query('pagination', 20));
+// Pagination
+        $perPage = request()->query('pagination', 20);
+        $applications = $application->paginate($perPage);
 
+// Response
         return ApplicationResource::collection($applications)->additional([
             'statistics' => [
-                'all_count'      => $allCount ?? 0,
-                'approved_count' => $approvedCount ?? 0,
-                'pending_count'  => $pendingCount ?? 0,
+                'current_month_count' => $currentMonthCount,
+                'all_count'      => $allCount,
+                'approved_count' => $approvedCount,
+                'pending_count'  => $pendingCount,
                 'ball'           => 0,
             ]
         ]);
