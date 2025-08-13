@@ -17,7 +17,8 @@ class Application extends Model
         'end_at',
         'date',
         'reason',
-        'plan'
+        'plan',
+        'status',
     ];
 
     protected $casts = [
@@ -30,6 +31,11 @@ class Application extends Model
     public function enterprise()
     {
         return $this->belongsTo(Enterprise::class);
+    }
+
+    public function checkApplications()
+    {
+        return $this->hasMany(ApplicationCheck::class);
     }
 
     public function teacher()

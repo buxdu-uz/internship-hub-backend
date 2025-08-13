@@ -31,6 +31,7 @@ class ApplicationResource extends JsonResource
             'enterprise' => new EnterPriseResource($this->enterprise),
             'teacher' => new UserResource($this->teacher),
             'files' => FileResource::collection($this->files),
+            'checks' => ApplicationCheckResource::collection($this->checkApplications),
         ];
     }
 

@@ -125,6 +125,10 @@ class ApplicationController extends Controller
             'status' => 'required|in:approved,rejected',
         ]);
 
+        Application::find($request->application_id)->update([
+            'status' => $request->status
+        ]);
+
         ApplicationCheck::create([
             'application_id' => $request->application_id,
             'checked_at' => now(),
