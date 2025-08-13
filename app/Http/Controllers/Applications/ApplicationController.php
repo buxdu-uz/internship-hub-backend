@@ -8,6 +8,7 @@ use App\Models\Application;
 use App\Models\ApplicationCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
@@ -115,9 +116,22 @@ class ApplicationController extends Controller
                 function ($attribute, $value, $fail) {
                     $application = Application::find($value);
                     $enterpriseId = Auth::user()->userEnterprise->enterprise_id;
-//                    dd($application,$enterpriseId);
-                    if ($enterpriseId != $application->enterprise_id){
+
+                    if (!$application) {
+                        return $fail('Ariza topilmadi.');
+                    }
+
+                    if ($enterpriseId != $application->enterprise_id) {
                         return $fail('Ushbu ariza sizning tashkilotingizga tegishli emas.');
+                    }
+
+                    // application_check jadvalida bor-yo'qligini tekshirish
+                    $alreadyChecked = DB::table('application_checks')
+                        ->where('application_id', $value)
+                        ->exists();
+
+                    if ($alreadyChecked) {
+                        return $fail('Ushbu ariza allaqachon tekshirilgan.');
                     }
                 }
             ],
@@ -177,7 +191,7 @@ class ApplicationController extends Controller
         $application = Application::find($request->application_id);
 
         $filename = Str::random(6) . '_' . time() . '.' . $request->file('file')->getClientOriginalExtension();
-        $request->file('file')->storeAs('public/files/applications/', $filename);
+        $request->file('file')->storeAs('files/applications/', $filename);
 
         $application->files()->create([
             'filename' => $filename,

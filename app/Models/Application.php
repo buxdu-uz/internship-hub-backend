@@ -33,9 +33,9 @@ class Application extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
-    public function checkApplications()
+    public function checkApplication()
     {
-        return $this->hasMany(ApplicationCheck::class);
+        return $this->hasOne(ApplicationCheck::class);
     }
 
     public function teacher()

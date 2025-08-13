@@ -15,8 +15,6 @@ class ApplicationCheckResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-
         return [
             'status' => $this->status,
             'comment' => $this->comment,
