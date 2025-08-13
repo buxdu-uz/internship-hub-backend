@@ -114,7 +114,8 @@ class ApplicationController extends Controller
                 'exists:applications,id',
                 function ($attribute, $value, $fail) {
                     $application = Application::find($value);
-                    $enterpriseId = Auth::user()->userEnterprise->id;
+                    $enterpriseId = Auth::user()->userEnterprise->enterprise_id;
+//                    dd($application,$enterpriseId);
                     if ($enterpriseId != $application->enterprise_id){
                         return $fail('Ushbu ariza sizning tashkilotingizga tegishli emas.');
                     }
