@@ -16,6 +16,7 @@ Route::get('universities',[UniversityController::class, 'index']);
 
 //GLOBAL ROUTE
 Route::group(['middleware' => ['auth:sanctum','cors']], function(){
+    Route::get('userEnterprise', [UserController::class,'userEnterprise']);
     Route::get('enterprise/all', [EnterpriseController::class,'getAll']);
     Route::get('roles', [UserController::class,'roles']);
     Route::get('user/all',[UserController::class,'getAll']);

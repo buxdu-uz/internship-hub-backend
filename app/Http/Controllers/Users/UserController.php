@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RoleResource;
+use App\Http\Resources\UserEnterpriseResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\UserEnterprise;
 use Exception;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -75,5 +77,11 @@ class UserController extends Controller
         }catch (Exception $exception){
             return $this->errorResponse($exception->getMessage());
         }
+    }
+
+    public function userEnterprise()
+    {
+        return UserEnterpriseResource::collection(UserEnterprise::query()
+        ->paginate(\request()->query('pagination', 20)));
     }
 }

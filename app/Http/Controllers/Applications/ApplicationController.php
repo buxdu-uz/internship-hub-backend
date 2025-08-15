@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Applications;
 
+use App\Filters\ApplicationFilter;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ApplicationFilterRequest;
 use App\Http\Resources\ApplicationResource;
 use App\Models\Application;
 use App\Models\ApplicationBall;
@@ -14,8 +16,9 @@ use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
-    public function index()
+    public function index(ApplicationFilterRequest $request)
     {
+        $filter = app()->make(ApplicationFilter::class, ['queryParams' => $request->query()]);
         $application = Application::query();
 
         $currentMonthCount = (clone $application)
@@ -48,7 +51,7 @@ class ApplicationController extends Controller
 
 // Pagination
         $perPage = request()->query('pagination', 20);
-        $applications = $application->paginate($perPage);
+        $applications = $application->filter($filter)->paginate($perPage);
 
 // Response
         return ApplicationResource::collection($applications)->additional([

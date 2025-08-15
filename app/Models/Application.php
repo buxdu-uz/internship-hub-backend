@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Models\Enterprise;
+use App\Models\Traits\Filterable;
 use App\Models\User;
 use App\Models\File;
 use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
 {
+    use Filterable;
+
     protected $fillable = [
         'enterprise_id',
         'teacher_id',
