@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Applications;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ApplicationResource;
 use App\Models\Application;
+use App\Models\ApplicationBall;
 use App\Models\ApplicationCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -200,5 +201,59 @@ class ApplicationController extends Controller
         ]);
 
         return $this->successResponse('Hisobot fayli muvaffaqiyatli yuklandi.');
+    }
+
+    public function setBall(Request $request)
+    {
+        $request->validate([
+            'application_id' => [
+                'required',
+                'exists:applications,id',
+                function ($attribute, $value, $fail) {
+                    $application = Application::find($value);
+
+                    if ($application->enterprise_id != Auth::user()->userEnterprise->enterprise_id) {
+                        $fail('Ushbu ariza sizning tashkilotingizga tegishli emas!.');
+                    }
+
+                    if ($application->status != 'approved') {
+                        $fail('Ball ni faqat qabul qilingan arizalar uchun qoyish mumkin.');
+                    }
+
+                    $alreadyUploaded = $application->files()
+                        ->where('fileable_id', $application->id)
+                        ->where('type', 'report')
+                        ->exists();
+
+                    $alreadySetBaled = $application->applicationBall()
+                        ->exists();
+
+                    if ($alreadySetBaled) {
+                        $fail('Ball allaqachon qo\'yilgan!');
+                    }
+
+                    if (!$alreadyUploaded) {
+                        $fail('Hisobot fayli yuklangman!');
+                    }
+                }
+            ],
+            'ball' => 'required|integer|min:1|max:100',
+            'comment' => 'sometimes|string',
+        ],[
+            'application_id.required' => 'Ariza ID majburiy.',
+            'application_id.exists' => 'Ushbu ariza topilmadi.',
+            'ball.required' => 'Ball maydoni majburiy.',
+            'ball.min' => 'Ball 1 dan kam bo\'lmasligi kerak.',
+            'ball.max' => 'Ball 100 dan oshmasligi kerak.',
+        ]);
+        ApplicationBall::create([
+            'application_id' => $request->application_id,
+            'ball' => $request->ball,
+            'user_id' => Auth::id(),
+            'comment' => $request->comment ?? null,
+        ]);
+
+
+        return $this->successResponse('Ball muvaffaqiyatli yuklandi.');
     }
 }

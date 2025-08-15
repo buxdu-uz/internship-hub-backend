@@ -28,6 +28,7 @@ class ApplicationResource extends JsonResource
             'start_at' => $this->start_at->format('Y-m-d H:i:s'),
             'end_at' => $this->end_at->format('Y-m-d H:i:s'),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'ball' => new ApplicationBallResource($this->applicationBall),
             'enterprise' => new EnterPriseResource($this->enterprise),
             'teacher' => new UserResource($this->teacher),
             'files' => FileResource::collection($this->files),

@@ -38,6 +38,11 @@ class Application extends Model
         return $this->hasOne(ApplicationCheck::class);
     }
 
+    public function applicationBall()
+    {
+        return $this->hasOne(ApplicationBall::class);
+    }
+
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');

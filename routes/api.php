@@ -32,6 +32,7 @@ Route::group(['middleware' => ['auth:sanctum','cors']], function(){
 //COMPANY-REPRESENTATIVE
     Route::group(['prefix' => 'company-representative','middleware' => ['role:company-representative']], function(){
         Route::post('application_check',[ApplicationController::class,'checkApplication']);
+        Route::post('setBall',[ApplicationController::class,'setBall']);
     });
 
 
