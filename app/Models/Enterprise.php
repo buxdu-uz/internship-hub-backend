@@ -8,6 +8,8 @@ class Enterprise extends Model
 {
     protected $fillable = [
         'name',
+        'person',
+        'phone',
         'description',
         'location'
     ];

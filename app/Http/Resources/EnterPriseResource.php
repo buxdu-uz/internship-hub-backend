@@ -17,6 +17,8 @@ class EnterPriseResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'person' => $this->person,
+            'phone' => $this->phone,
             'location' => $this->location,
             'description' => $this->description,
         ];
