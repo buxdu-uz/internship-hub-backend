@@ -14,6 +14,9 @@ Route::post('register',[AuthController::class, 'register']);
 Route::post('login',[AuthController::class, 'login']);
 Route::get('universities',[UniversityController::class, 'index']);
 
+Route::post('login/hemis',[AuthController::class,'checkHemisAuth'])->middleware('cors');
+
+
 //GLOBAL ROUTE
 Route::group(['middleware' => ['auth:sanctum','cors']], function(){
     Route::get('userEnterprise', [UserController::class,'userEnterprise']);

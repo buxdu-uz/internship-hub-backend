@@ -17,14 +17,23 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
+            $table->unsignedBigInteger('university_code')->nullable()->index();
             $table->string('firstname');
             $table->string('lastname');
             $table->string('surname');
-            $table->string('phone')->unique();
-            $table->date('birth');
-            $table->enum('sex',['male','female','other']);
-            $table->string('organization');
+            $table->string('phone')->unique()->nullable();
+            $table->string('birth')->nullable();
+            $table->enum('sex',['male','female','other'])->nullable();
+            $table->string('passport_number')->unique()->nullable();
+            $table->string('passport_pinfl')->unique()->nullable();
+            $table->string('avatar')->nullable();
+            $table->string('organization')->nullable();
             $table->text('bio')->nullable();
+
+//            $table->foreign('university_code')
+//                ->references('code')
+//                ->on('universities')
+//                ->cascadeOnUpdate();
         });
     }
 
