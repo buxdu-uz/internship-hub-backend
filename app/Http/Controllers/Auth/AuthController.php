@@ -181,19 +181,13 @@ class AuthController extends Controller
         $request->validate([
             'state' => 'required'
         ]);
-//        dd($sessionState->state, $request->state);
-        // Compare state and code from session
+
         if ($sessionState->state === $request->state) {
             $employee_id = $sessionState->employee_id_number;
-//            Log::info("enmployeeid",$employee_id);
-//            if ($employee_id == 3041911001 || $employee_id == 3042311060 || $employee_id == 3042011168 || $employee_id == 3041411007) {
-            // Find the user in DB (optional if full object already in session)
+
             $authUser = User::query()
-//                    ->whereIn('employee_id_number', [3041911001,3042311060,3042011168,3041411007])
                 ->where('login', $employee_id)
                 ->first();
-
-//                Log::info("auth user",$authUser);
 
             if ($authUser) {
                 // Log in the user
@@ -202,19 +196,9 @@ class AuthController extends Controller
                 // Optional: regenerate session for security
                 Session::regenerate();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Login successful',
-                    'user' => new UserResource($authUser),
-                    'token' => $authUser->createToken('API Token')->plainTextToken, // if using Sanctum
-                ]);
+                return $this->successResponse($authUser->createToken('API Token')->plainTextToken,new LoginResource($authUser));
 
             }
-//            }else{
-//                return response()->json([
-//                    'message' => 'Sizning kirishingizga ruxsat mavjud emas!',
-//                ], 403);
-//            }
         }
 
         return response()->json([
