@@ -155,7 +155,7 @@ class AuthController extends Controller
                         'passport_number' => $user['passport_number'],
                     ]);
 
-                $usr->assignRole('citizen');
+                $usr->assignRole('teacher');
             }
 
 
